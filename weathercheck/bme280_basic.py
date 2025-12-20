@@ -7,9 +7,6 @@ import smbus2
 # Initialize I2C bus
 bus = smbus2.SMBus(1)
 
-# Load calibration parameters
-calibration_params = bme280.load_calibration_params(bus, address)
-
 
 def celsius_to_fahrenheit(celsius):
     return (celsius * 9 / 5) + 32
@@ -17,6 +14,8 @@ def celsius_to_fahrenheit(celsius):
 
 # BME280 sensor address (default address)
 def get_data(address=0x77):
+    # Load calibration parameters
+    calibration_params = bme280.load_calibration_params(bus, address)
     b = 17.62
     c = 243.12
 
