@@ -3,7 +3,7 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-
+import ipdb
 import matplotlib
 import pandas as pd
 
@@ -58,6 +58,7 @@ def parse_command_line(str_input=None):
         dest="revisit_time",
         help="Number of seconds to revisit the measurmeent.",
         required=True,
+        type=int,
     )
     parser.add_argument(
         "-p",
@@ -65,6 +66,7 @@ def parse_command_line(str_input=None):
         dest="plot_revist",
         help="Number of seconds to revist the ploting and savedata.",
         required=True,
+        type=int,
     )
     parser.add_argument(
         "-f",
@@ -102,22 +104,26 @@ def mkdf():
     df_w = pd.DataFrame(dfdict, index=[ts1])
     return df_w, ts1
 
-
 def plot_and_save(df_in, plotpath, datapath):
     fig, ax = plt.subplots(1, 1, figsize=(8, 10))
-    df_in.plot(x="Time", y="Temperature in C", ax=ax)
+    df_in.plot(y="Temperature in F", ax=ax)
+    ax.grid(True)
     now = datetime.now().replace(microsecond=0).astimezone(timezone.utc)
     now_str = now.isoformat()[:-6]
     plotstr = str(plotpath.joinpath(now_str + ".png"))
     datastr = str(datapath.joinpath(now_str + ".csv"))
     print("Saving figure to " + plotstr)
-    plt.savefig(now_str + ".png", dpi=300)
+    plt.savefig(plotstr, dpi=300)
     plt.close(fig)
     print("Saving data to " + datastr)
     df_in.to_csv(datastr)
 
 
 def save_to_pandas(revisit_time, plot_revist, plotdir, datadir):
+    print(f"Revist Time: {revisit_time} s")
+    print(f"Plot Time: {plot_revist} s")
+    print(f"Plot save dir{plotdir}")
+    print(f"Data save dir{datadir}")
     plotpath = Path(plotdir)
     datapath = Path(datadir)
     td = timedelta(seconds=revisit_time)
