@@ -79,7 +79,7 @@ def parse_command_line(str_input=None):
         dest="datadir",
         help="Directory where the data will be saved",
         default="/home/swoboj/weatherdata",
-
+    )
     if str_input is None:
         return parser.parse_args()
     return parser.parse_args(str_input)
