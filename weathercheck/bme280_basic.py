@@ -93,7 +93,7 @@ if __name__ == "__main__":
             print("Temperature: {:.2f} °C, {:.2f} °F".format(temp_c, temp_f))
             print("Pressure: {:.2f} hPa".format(pres))
             print("Humidity: {:.2f} %".format(hum))
-            print("Dewpoint: {:.2f} %".format(dewpoint))
+            print("Dewpoint: {:.2f} °C, {:.2f} °F".format(dewpoint, dewpoint_f))
             # Wait for a few seconds before the next reading
             time.sleep(2)
         except KeyboardInterrupt:
