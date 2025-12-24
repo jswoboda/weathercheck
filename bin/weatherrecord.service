@@ -1,0 +1,11 @@
+[Unit]
+Description=Run weather recording service
+
+[Service]
+Type=simple
+ExecStart=/home/swoboj/miniconda3/bin/python /home/swoboj/weathercheck/bin/run_weather.py -r 5 -p 50 /home/swoboj/weatherplots/ -d /home/swoboj/weatherdata
+Restart=always
+WorkingDirectory=/home/swoboj/
+
+[Install]
+WantedBy=multi-user.target
