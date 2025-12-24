@@ -87,7 +87,7 @@ def get_bme280_data(address=0x77):
 if __name__ == "__main__":
     while True:
         try:
-            temp_c, temp_f, dewpoint, hum, pres = get_data()
+            temp_c, temp_f, dewpoint, dewpoint_f, hum, pres, ts = get_bme280_data()
 
             # Print the readings
             print("Temperature: {:.2f} °C, {:.2f} °F".format(temp_c, temp_f))
