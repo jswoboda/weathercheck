@@ -31,3 +31,7 @@ systemctl --user start weatherrecord.service
 ```
 sudo loginctl enable-linger $USER
 ```
+
+## Notes 
+
+When using the gps module from adafruit the serial port is not always `/dev/ttyUSB0` if using the USB-C version of the module. It's usually in the `/dev/serial/`
