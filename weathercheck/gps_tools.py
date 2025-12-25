@@ -5,13 +5,13 @@
 # Will wait for a fix and print a message every second with the current location
 # and other details.
 import time
-
+from pathlib import Path
 import adafruit_gps
 import serial
 import yaml
 
 
-def get_gps(configfile="~/keys/serial.yaml"):
+def get_gps(configfile="~/keys/serialports.yaml"):
     """This gets the GPS object and starts it running.
 
     Parameters
@@ -33,6 +33,8 @@ def get_gps(configfile="~/keys/serial.yaml"):
     # uart = busio.UART(tx, rx, baudrate=9600, timeout=10)
     # for a computer, use the pyserial library for uart access
     #
+    p1 = Path(configfile)
+    configfile = str(p1.expanduser())
     with open(configfile, "r") as file:
         serialconfig = yaml.safe_load(file)
     uart = serial.Serial(serialconfig["gps"], baudrate=9600, timeout=10)
