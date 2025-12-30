@@ -3,12 +3,12 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-import ipdb
 
+import ipdb
 import matplotlib
 import pandas as pd
 
-from weathercheck import get_bme280_data, sys_stats
+from weathercheck import get_bme280_data, mkdf, sys_stats
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -88,24 +88,19 @@ def parse_command_line(str_input=None):
     return parser.parse_args(str_input)
 
 
-def mkdf():
-    colsw = [
-        "Temperature in C",
-        "Temperature in F",
-        "Dewpoint in C",
-        "Dewpoint in F",
-        "Humidity",
-        "Pressure",
-        "Time",
-    ]
-    data_init = get_bme280_data()
-    dfdict = {icol: idata for icol, idata in zip(colsw, data_init)}
-    ts1 = dfdict["Time"]
-    del dfdict["Time"]
-    df_w = pd.DataFrame(dfdict, index=[ts1])
-    return df_w, ts1
-
 def plot_and_save(df_in, plotpath, datapath):
+    """Plots info from the data frame and saves it.
+
+    Parameters
+    ----------
+    df_in : pd.DataFrame
+        The data frame that will be saved and plotted.
+    plotpath : Path
+        The location of the saved plots.
+    datapath : Path
+        The location of the saved data.
+
+    """
     fig, ax = plt.subplots(1, 1, figsize=(8, 10))
     df_in.plot(y="Temperature in F", ax=ax)
     ax.grid(True)
@@ -121,6 +116,19 @@ def plot_and_save(df_in, plotpath, datapath):
 
 
 def save_to_pandas(revisit_time, plot_revist, plotdir, datadir):
+    """Performs the scheduling and saving the data. This function will run perminately.
+
+    Parameters
+    ----------
+    revist_time : int
+        Number of seconds for each revisit.
+    plot_revisit : int
+        Number of seconds for each revisit.
+    plotdir : str
+        Location of where the plots will be kept.
+    datadir : str
+        Location of the csv data.
+    """
     print(f"Revist Time: {revisit_time} s")
     print(f"Plot Time: {plot_revist} s")
     print(f"Plot save dir{plotdir}")

@@ -3,6 +3,7 @@ import time
 from datetime import datetime, timezone
 
 import bme280
+import pandas as pd
 import smbus2
 
 # Initialize I2C bus
@@ -82,6 +83,33 @@ def get_bme280_data(address=0x77):
         ts = datetime.now().astimezone(timezone.utc)
 
     return temp_c, temp_f, dewpoint, dewpoint_f, hum, pres, ts
+
+
+def mkdf():
+    """Calls the bme280 measurment function and places the data into a single row data frame that can be concatenated.
+
+    Returns
+    -------
+    df_w : pd.DataFrame
+        The single row data frame.
+    ts1 : Datetime.Datetime
+        The datetime object from the measurement.
+    """
+    colsw = [
+        "Temperature in C",
+        "Temperature in F",
+        "Dewpoint in C",
+        "Dewpoint in F",
+        "Humidity",
+        "Pressure",
+        "Time",
+    ]
+    data_init = get_bme280_data()
+    dfdict = {icol: idata for icol, idata in zip(colsw, data_init)}
+    ts1 = dfdict["Time"]
+    del dfdict["Time"]
+    df_w = pd.DataFrame(dfdict, index=[ts1])
+    return df_w, ts1
 
 
 if __name__ == "__main__":
