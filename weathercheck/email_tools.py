@@ -11,6 +11,11 @@ def send_email(username, passkey, subject_text, messagetxt, receiverlist, files)
     port = 587
 
     message = EmailMessage()
+    message["Subject"] = subject_text
+    message["From"] = username
+    message["To"] = ", ".join(receiverlist)
+    message.set_content(messagetxt)
+
     for file in files:
         with open(file, "rb") as f:
             image_data = f.read()
@@ -20,10 +25,6 @@ def send_email(username, passkey, subject_text, messagetxt, receiverlist, files)
             image_data, maintype="image", subtype=image_type, filename=image_name
         )
 
-    message["Subject"] = subject_text
-    message["From"] = username
-    message["To"] = ", ".join(receiverlist)
-    message.set_content(messagetxt)
     try:
         server = smtplib.SMTP(smtp_server, port)
         server.starttls()
