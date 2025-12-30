@@ -1,3 +1,4 @@
+import platform
 import shutil
 import time
 
@@ -46,3 +47,24 @@ def sys_stats():
     ram_usedGB = ram.used * 2**-30
 
     return uptime, cpu_use, ram_per, ram_usedGB
+
+
+def get_system_dict():
+    """Get a dictionary holding all of the system info at the moment.
+
+    Returns
+    -------
+    sys_name : str
+        Name of the system from the platform module
+    sys_info : dict
+        Dictionary holding the system information.
+    """
+    sys_name = platform.node()
+    disk_info = get_disk_use()
+    disk_names = ["disksizeGB", "useddiskGB", "freediskGB"]
+    sys_info = {ikey: iobj for ikey, iobj in zip(disk_names, disk_info)}
+    sys_list = sys_stats()
+    sys_name = ["uptime", "cpuuse", "rampercent", "ramuseGB"]
+    sys_dict = {ikey: iobj for ikey, iobj in zip(sys_name, sys_list)}
+    sys_info.update(sys_dict)
+    return sys_name, sys_info

@@ -25,7 +25,7 @@ systemctl --user enable weatherrecord.service
 systemctl --user start weatherrecord.service
 ```
 
-* `journalctl --user-unit weatherrecord.service` (or `tail -f /var/log/syslog`)
+* `journalctl -r --user-unit weatherrecord.service` (or `tail -f /var/log/syslog`)
 * To run on boot 
 
 ```
