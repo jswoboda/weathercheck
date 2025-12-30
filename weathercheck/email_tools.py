@@ -1,8 +1,9 @@
-import imghdr
 import smtplib
 from email import encoders
 from email.message import EmailMessage
 from email.mime.base import MIMEBase
+
+import filetype
 
 
 def send_email(username, passkey, subject_text, messagetxt, receiverlist, files):
@@ -13,7 +14,7 @@ def send_email(username, passkey, subject_text, messagetxt, receiverlist, files)
     for file in files:
         with open(file, "rb") as f:
             image_data = f.read()
-            image_type = imghdr.what(f.name)
+            image_type = filetype.guess(f.name).extension
             image_name = f.name
         message.add_attachment(
             image_data, maintype="image", subtype=image_type, filename=image_name
