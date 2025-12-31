@@ -1,5 +1,3 @@
-"""Just shows the curent readings on the bme280."""
-
 import time
 
 from weathercheck import get_bme280_data
