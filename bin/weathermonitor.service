@@ -1,0 +1,11 @@
+[Unit]
+Description=Run weather recording service
+
+[Service]
+Type=simple
+ExecStart=/home/swoboj/weathercheck/bin/weathermonitor.sh
+Restart=no
+WorkingDirectory=/home/swoboj/
+
+[Install]
+WantedBy=default.target

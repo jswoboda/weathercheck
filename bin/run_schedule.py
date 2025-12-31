@@ -14,9 +14,8 @@ import yaml
 from weathercheck import get_bme280_data, mkdf, send_email, sys_stats
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
 import ipdb
+import matplotlib.pyplot as plt
 
 
 def parse_command_line(str_input=None):
@@ -113,14 +112,14 @@ def parse_command_line(str_input=None):
 # GLOBAL
 DF_GLOBE, last_ts = mkdf()
 DF_EMERG = DF_GLOBE.copy()
-TIME_ZONE = 'utc'
+TIME_ZONE = "utc"
 TEMP_FLAG = False
 DROP_TIME = datetime(year=2025, month=1, day=1).astimezone(timezone.utc)
 EMAIL_TIME = datetime(year=2025, month=1, day=1).astimezone(timezone.utc)
 
 
 def send_emergency_email(plotpath, emailconfig):
-    global DF_EMERG, EMAIL_TIME,TIME_ZONE
+    global DF_EMERG, EMAIL_TIME, TIME_ZONE
     EMAIL_TIME = datetime.now().astimezone(timezone.utc)
     fig, ax = plt.subplots(1, 1, figsize=(8, 10))
     df_plot = DF_EMERG.copy()
@@ -143,13 +142,13 @@ def updatedf(thresh_f, plotpath, emailconfig):
     df_i, last_ts = mkdf()
     DF_GLOBE = pd.concat([DF_GLOBE, df_i])
 
-    if df_i['Temperature in F'].iloc[0] < thresh_f and not TEMP_FLAG:
+    if df_i["Temperature in F"].iloc[0] < thresh_f and not TEMP_FLAG:
         TEMP_FLAG = True
         DROP_TIME = last_ts
         DF_EMERG = df_i.copy()
-    elif df_i['Temperature in F'].iloc[0] >= thresh_f and TEMP_FLAG:
+    elif df_i["Temperature in F"].iloc[0] >= thresh_f and TEMP_FLAG:
         TEMP_FLAG = False
-    elif df_i['Temperature in F'].iloc[0] < thresh_f and TEMP_FLAG:
+    elif df_i["Temperature in F"].iloc[0] < thresh_f and TEMP_FLAG:
         DF_EMERG = pd.concat([DF_EMERG, df_i])
 
     email_check = last_ts > EMAIL_TIME + timedelta(days=1)
@@ -169,7 +168,7 @@ def plot_and_save(plotpath, datapath):
         The location of the saved data.
 
     """
-    global DF_GLOBE,TIME_ZONE
+    global DF_GLOBE, TIME_ZONE
     fig, ax = plt.subplots(1, 1, figsize=(8, 10))
     df_plot = DF_GLOBE.copy()
     df_plot.index = df_plot.index.tz_convert(TIME_ZONE)
@@ -199,7 +198,7 @@ def run_schedule(thresh_f, revisit_time, plottod, plotdir, datadir, yamlconfig):
     with open(yamlconfig, "r") as file:
         configdict = yaml.safe_load(file)
     emailconfig = configdict["emergency_email"]
-    TIME_ZONE = configdict.get('timezone',"utc")
+    TIME_ZONE = configdict.get("timezone", "utc")
     update_job = schedule.every(revisit_time).seconds.do(
         updatedf, thresh_f=thresh_f, plotpath=plotpath, emailconfig=emailconfig
     )
