@@ -9,7 +9,10 @@ Experiment using MQTT and iotdb
   * pandas
   * adafruit-blinka
   * adafruit-circuitpython-gps
-  * adafruit-circuitpython-bme280
+  * RPi.bme280    
+  * pyyaml
+  * psutil
+  * schedule
 * Run the setup.py 
   
 ``` bash
