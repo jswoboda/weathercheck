@@ -12,6 +12,8 @@ from setuptools import find_packages, setup
 
 req = [
     "numpy",
+    "schedule",
+    "filetype",
     "scipy",
     "matplotlib",
     "pandas",

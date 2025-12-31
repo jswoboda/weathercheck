@@ -1,12 +1,27 @@
 import smtplib
-from email import encoders
 from email.message import EmailMessage
-from email.mime.base import MIMEBase
 
 import filetype
 
 
 def send_email(username, passkey, subject_text, messagetxt, receiverlist, files):
+    """Sends an email through gmail with attachements.
+
+    Parameters
+    ----------
+    username : str
+        Name of the sender email.
+    passkey : str
+        Password for the email account
+    subject_text : str
+        The Subject text for the email
+    message_text : str
+        The message text for the email
+    receiverlist : list
+        A list of email addresses.
+    files : list
+        A list of files that will be sent.
+    """
     smtp_server = "smtp.gmail.com"
     port = 587
 
