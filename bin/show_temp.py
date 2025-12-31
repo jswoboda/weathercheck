@@ -1,3 +1,6 @@
+#!python
+"""Prints out the temperature humidity and dew point."""
+
 import time
 
 from weathercheck import get_bme280_data
@@ -8,7 +11,7 @@ if __name__ == "__main__":
             temp_c, temp_f, dewpoint, dewpoint_f, hum, pres, ts = get_bme280_data()
 
             # Print the readings
-            print(f"Time of reading: {0}".format(ts))
+            print("Time of reading: {0}".format(ts.replace(microsecond=0)))
             print("Temperature: {:.2f} °C, {:.2f} °F".format(temp_c, temp_f))
             print("Pressure: {:.2f} hPa".format(pres))
             print("Humidity: {:.2f} %".format(hum))

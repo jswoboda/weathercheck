@@ -19,8 +19,9 @@ req = [
     "pandas",
     "adafruit-blinka",
     "adafruit-circuitpython-gps",
-    "adafruit-circuitpython-bme280",
-    "bme280",
+    "RPi.bme280",
+    "pyyaml",
+    "psutil",
 ]
 scripts = ["bin/run_weather.py", "bin/show_temp.py", "bin/run_schedule.py"]
 
