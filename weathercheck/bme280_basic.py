@@ -85,15 +85,13 @@ def get_bme280_data(address=0x77):
     return temp_c, temp_f, dewpoint, dewpoint_f, hum, pres, ts
 
 
-def mkdf():
-    """Calls the bme280 measurment function and places the data into a single row data frame that can be concatenated.
+def bme280_dict():
+    """Puts the b280 data into a dictionary.
 
     Returns
     -------
-    df_w : pd.DataFrame
-        The single row data frame.
-    ts1 : Datetime.Datetime
-        The datetime object from the measurement.
+    dfdict : dict
+        Puts the data from the bme280 call to a dictionary.
     """
     colsw = [
         "Temperature in C",
@@ -106,6 +104,20 @@ def mkdf():
     ]
     data_init = get_bme280_data()
     dfdict = {icol: idata for icol, idata in zip(colsw, data_init)}
+    return dfdict
+
+
+def mkdf():
+    """Calls the bme280 measurment function and places the data into a single row data frame that can be concatenated.
+
+    Returns
+    -------
+    df_w : pd.DataFrame
+        The single row data frame.
+    ts1 : Datetime.Datetime
+        The datetime object from the measurement.
+    """
+    dfdict = bme280_dict()
     ts1 = dfdict["Time"]
     del dfdict["Time"]
     df_w = pd.DataFrame(dfdict, index=[ts1])

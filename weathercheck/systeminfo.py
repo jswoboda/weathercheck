@@ -63,8 +63,8 @@ def get_system_dict():
     disk_info = get_disk_use()
     disk_names = ["disksizeGB", "useddiskGB", "freediskGB"]
     sys_info = {ikey: iobj for ikey, iobj in zip(disk_names, disk_info)}
-    sys_list = sys_stats()
-    sys_name = ["uptime", "cpuuse", "rampercent", "ramuseGB"]
-    sys_dict = {ikey: iobj for ikey, iobj in zip(sys_name, sys_list)}
+    stats_list = sys_stats()
+    stats_names = ["uptime", "cpuuse", "rampercent", "ramuseGB"]
+    sys_dict = {ikey: iobj for ikey, iobj in zip(stats_names, stats_list)}
     sys_info.update(sys_dict)
     return sys_name, sys_info
