@@ -10,13 +10,11 @@ from datetime import datetime
 
 from paho.mqtt import client as mqtt_client
 
-client_id = f"python-mqtt-{random.randint(0, 1000)}"
-
 
 def connect_mqtt(
     broker,
     port,
-    client_id,
+    client_id=f"python-mqtt-{random.randint(0, 1000)}",
     ca_certs_in=None,
     certfile_in=None,
     keyfile_in=None,

@@ -23,7 +23,12 @@ req = [
     "pyyaml",
     "psutil",
 ]
-scripts = ["bin/run_weather.py", "bin/show_temp.py", "bin/run_schedule.py"]
+scripts = [
+    "bin/run_weather.py",
+    "bin/show_temp.py",
+    "bin/run_schedule.py",
+    "bin/run_scraper.py",
+]
 
 
 config = dict(
