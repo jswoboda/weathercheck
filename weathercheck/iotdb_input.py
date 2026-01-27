@@ -22,6 +22,7 @@ class iotdb_session(object):
         measurements_list_,
         data_type_list_,
         ts_name,
+        store_group,
         device_id,
         fetch_size=1024,
         zone_id="UTC",
@@ -31,13 +32,14 @@ class iotdb_session(object):
             ip, port_, username_, password_, fetch_size, zone_id, enable_redirection
         )
         self.sesh.open(False)
+        self.sesh.set_storage_group(store_group)
         self.ts_name = ts_name
         self.measurements = measurements_list_
         self.datatypes = data_type_list_
         encoding_lst_ = [TSEncoding.PLAIN for _ in range(len(data_type_list_))]
         compressor_lst_ = [Compressor.SNAPPY for _ in range(len(data_type_list_))]
         self.sesh.create_aligned_time_series(
-            ts_name,
+            store_group + "." + ts_name,
             measurements_list_,
             data_type_list_,
             encoding_lst_,
