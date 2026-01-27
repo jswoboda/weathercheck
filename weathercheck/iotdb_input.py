@@ -30,6 +30,7 @@ class iotdb_session(object):
         self.sesh = Session(
             ip, port_, username_, password_, fetch_size, zone_id, enable_redirection
         )
+        self.sesh.open(False)
         self.ts_name = ts_name
         self.measurements = measurements_list_
         self.datatypes = data_type_list_
