@@ -27,7 +27,7 @@ class iotdb_session(object):
         zone_id="UTC",
         enable_redirection=True,
     ):
-        self.sesh = Session.init_from_node_urls(
+        self.sesh = Session(
             ip, port_, username_, password_, fetch_size, zone_id, enable_redirection
         )
         self.ts_name = ts_name
