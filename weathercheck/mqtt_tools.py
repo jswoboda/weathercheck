@@ -57,6 +57,60 @@ def connect_mqtt(
     return client
 
 
+def subscribe(client: mqtt_client, topic: str):
+    #
+    # ------------------------------
+    # mqtt returns the message here
+    # ------------------------------
+    #
+    def on_message(client, userdata, msg_in):
+        msg_decode = msg_in.payload.decode()
+        try:
+            msg_dejson = json.loads(msg_decode)
+        except:
+            msg_dejson = None
+
+        if msg_dejson == None:
+            msg_dejson = msg_decode
+        # endif no dejson
+        print(f"Received `{msg_dejson}` from `{msg_in.topic}` topic")
+
+        err_f, inDict = mqtt2dict(msg_dejson)
+
+        if not err_f:
+            err_f = decode_uptime(inDict)
+            # endif
+
+        client.subscribe(topic)
+        client.on_message = on_message
+
+
+def mqtt2dict(msg):
+    """"""
+    err_f = False  # init return variables
+    respDict = None
+
+    keystr = "messages:"  # find known prefix
+    index = msg.find(keystr)
+    if index < 0:
+        emsg = "config: prefix '%s' not found in:'%s'" % (keystr, msg)
+        print(emsg)
+        err_f = True
+    else:
+        evalStr = msg[index + len(keystr) :]  # strip prefix
+        evalStr = evalStr.strip()  # strip whitespace
+    try:
+        respDict = eval(evalStr)  # eval dict-as-string to dict
+    except Exception as eobj:
+        print("Exception:", eobj)
+        emsg = "config: dictionary expected: %s" % (evalStr)
+        print(emsg)
+        err_f = True
+    # end else
+
+    return err_f, respDict
+
+
 def publish_dict(client, topic, jsonmsg):
     """Publishes a dictionary and will check for datetime objects and change them to timestamps.
 
@@ -88,22 +142,22 @@ def publish_dict(client, topic, jsonmsg):
         return False
 
 
-FIRST_RECONNECT_DELAY = 1
-RECONNECT_RATE = 2
-MAX_RECONNECT_COUNT = 12
-MAX_RECONNECT_DELAY = 60
+def on_disconnect(client, userdata, flags, reason_code, properties):
+    """The function for disconneting"""
+    # logging.info("Disconnected with result code: %s", rc)
+    FIRST_RECONNECT_DELAY = 1
+    RECONNECT_RATE = 2
+    MAX_RECONNECT_COUNT = 12
+    MAX_RECONNECT_DELAY = 60
 
-
-def on_disconnect(client, userdata, rc):
-    logging.info("Disconnected with result code: %s", rc)
     reconnect_count, reconnect_delay = 0, FIRST_RECONNECT_DELAY
     while reconnect_count < MAX_RECONNECT_COUNT:
-        logging.info("Reconnecting in %d seconds...", reconnect_delay)
+        # logging.info("Reconnecting in %d seconds...", reconnect_delay)
         time.sleep(reconnect_delay)
 
         try:
             client.reconnect()
-            logging.info("Reconnected successfully!")
+            # logging.info("Reconnected successfully!")
             return
         except Exception as err:
             logging.error("%s. Reconnect failed. Retrying...", err)
@@ -111,4 +165,4 @@ def on_disconnect(client, userdata, rc):
         reconnect_delay *= RECONNECT_RATE
         reconnect_delay = min(reconnect_delay, MAX_RECONNECT_DELAY)
         reconnect_count += 1
-    logging.info("Reconnect failed after %s attempts. Exiting...", reconnect_count)
+    # logging.info("Reconnect failed after %s attempts. Exiting...", reconnect_count)

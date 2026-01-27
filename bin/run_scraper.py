@@ -131,7 +131,21 @@ def sys_scrape_cont(client):
 
 
 def scraper_main(broker, port, enrevisit, sysrevisit, certfolder=""):
-    """"""
+    """Runs the Scraper function.
+
+    Parameters
+    ----------
+    broker : str
+        Address of the broker.
+    port : int
+        Port number for the publisher
+    enrevisit : int
+        Number of seconds for revisting the sensor.
+    sysrevist : int
+        Number of seconds for checking the system info.
+    certfolder : int
+        The folder holding the certs.
+    """
     global SYS_FAIL_COUNT, BME_FAIL_COUNT
     client = connect_mqtt(broker, port)
 

@@ -1,6 +1,7 @@
 import platform
 import shutil
 import time
+from datetime import UTC, datetime
 
 import psutil
 
@@ -38,15 +39,17 @@ def sys_stats():
         Percentage of RAM being used.
     ram_usedGB : float
         Same as ram percentage but in GB.
-
+    timestamp : float
+        UTC Time stamp in s.
     """
     uptime = time.monotonic()
     cpu_use = psutil.cpu_percent(interval=1)
     ram = psutil.virtual_memory()
     ram_per = ram.percent
     ram_usedGB = ram.used * 2**-30
+    timestamp = datetime.now(UTC).timestamp()
 
-    return uptime, cpu_use, ram_per, ram_usedGB
+    return uptime, cpu_use, ram_per, ram_usedGB, timestamp
 
 
 def get_system_dict():
@@ -64,7 +67,7 @@ def get_system_dict():
     disk_names = ["disksizeGB", "useddiskGB", "freediskGB"]
     sys_info = {ikey: iobj for ikey, iobj in zip(disk_names, disk_info)}
     stats_list = sys_stats()
-    stats_names = ["uptime", "cpuuse", "rampercent", "ramuseGB"]
+    stats_names = ["uptime", "cpuuse", "rampercent", "ramuseGB", "timestamp"]
     sys_dict = {ikey: iobj for ikey, iobj in zip(stats_names, stats_list)}
     sys_info.update(sys_dict)
     return sys_name, sys_info

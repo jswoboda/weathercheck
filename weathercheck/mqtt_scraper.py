@@ -26,12 +26,13 @@ def bme280_scrape(client, sys_name=None, topic_suf="BME280reading"):
 
     """
     if sys_name is None:
-        sys_name = platform.node
-    topic = sys_name + "/" + "topic"
+        sys_name = platform.node()
+    topic = sys_name + "/" + topic_suf
     bme_data = bme280_dict()
     for ikey, iobj in bme_data.items():
         if isinstance(iobj, datetime):
-            bme_data[ikey] = iobj.timestamp()
+            bme_data["timestamp"] = iobj.timestamp()
+            del bme_data[ikey]
     bmejson = json.dumps(bme_data)
     return publish_dict(client, topic, bmejson)
 
@@ -57,9 +58,10 @@ def sys_scrape(client, sys_name=None, topic_suf="compute_status"):
 
     if sys_name is None:
         sys_name = sys_read_name
-    topic = sys_name + "/" + "topic"
+    topic = sys_name + "/" + topic_suf
     for ikey, iobj in sys_data.items():
         if isinstance(iobj, datetime):
-            sys_data[ikey] = iobj.timestamp()
+            sys_data["timestamp"] = iobj.timestamp()
+            del sys_data[ikey]
     sysjson = json.dumps(sys_data)
     return publish_dict(client, topic, sysjson)
