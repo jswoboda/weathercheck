@@ -26,11 +26,9 @@ class iotdb_session(object):
         device_id,
         fetch_size=1024,
         zone_id="UTC",
-        enable_redirection=True,
+        enable_redirection=False,
     ):
-        self.sesh = Session(
-            ip, port_, username_, password_, fetch_size, zone_id, enable_redirection
-        )
+        self.sesh = Session(ip, port_, username_, password_, fetch_size, zone_id)
         self.sesh.open(False)
         self.sesh.set_storage_group(store_group)
         self.ts_name = ts_name
@@ -65,7 +63,7 @@ class iotdb_session(object):
             cur_ts = int(datetime.now(UTC).timestamp())
         self.sesh.insert_aligned_record(
             self.store_group + "." + self.ts_name,
-            int(cur_ts),
+            int(cur_ts * 1e3),  # time stamps are for millisecondss
             meas_list,
             d_list,
             val_list,
