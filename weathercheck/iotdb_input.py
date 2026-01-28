@@ -34,6 +34,7 @@ class iotdb_session(object):
         self.sesh.open(False)
         self.sesh.set_storage_group(store_group)
         self.ts_name = ts_name
+        self.store_group = store_group
         self.measurements = measurements_list_
         self.datatypes = data_type_list_
         encoding_lst_ = [TSEncoding.PLAIN for _ in range(len(data_type_list_))]
@@ -61,9 +62,13 @@ class iotdb_session(object):
                 d_list.append(self.datatypes[cur_ind])
                 val_list.append(iobj)
         if cur_ts is None:
-            cur_ts = datetime.now(UTC).timestamp()
+            cur_ts = int(datetime.now(UTC).timestamp())
         self.sesh.insert_aligned_record(
-            self.ts_name, cur_ts, meas_list, d_list, val_list
+            self.store_group + "." + self.ts_name,
+            int(cur_ts),
+            meas_list,
+            d_list,
+            val_list,
         )
 
 
