@@ -10,10 +10,13 @@ from datetime import datetime
 
 from paho.mqtt import client as mqtt_client
 
+from .iotdb_input import iotdb_session
+
 
 def connect_mqtt(
     broker,
     port,
+    iotdb_sesh,
     client_id=f"python-mqtt-{random.randint(0, 1000)}",
     ca_certs_in=None,
     certfile_in=None,
@@ -54,10 +57,11 @@ def connect_mqtt(
     client.on_connect = on_connect
     client.connect(broker, port, keepalive)
     client.on_disconnect = on_disconnect
+
     return client
 
 
-def subscribe(client: mqtt_client, topic: str):
+def subscribe(client: mqtt_client, topic: str, iotdb_sesh: iotdb_session):
     #
     # ------------------------------
     # mqtt returns the message here
@@ -70,19 +74,12 @@ def subscribe(client: mqtt_client, topic: str):
         except:
             msg_dejson = None
 
-        if msg_dejson == None:
+        if msg_dejson is None:
             msg_dejson = msg_decode
-        # endif no dejson
-        print(f"Received `{msg_dejson}` from `{msg_in.topic}` topic")
+        else:
+            iotdb_sesh.insert_data(msg_in.topic, msg_dejson)
 
-        err_f, inDict = mqtt2dict(msg_dejson)
-
-        if not err_f:
-            err_f = decode_uptime(inDict)
-            # endif
-
-        client.subscribe(topic)
-        client.on_message = on_message
+    client.subscribe(topic)
 
 
 def mqtt2dict(msg):

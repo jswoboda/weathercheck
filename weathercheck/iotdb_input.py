@@ -2,6 +2,7 @@ import json
 import sys
 from datetime import UTC, datetime
 
+import numpy as np
 from iotdb.dbapi import connect
 from iotdb.Session import Session
 from iotdb.utils.IoTDBConstants import Compressor, TSDataType, TSEncoding
@@ -10,8 +11,22 @@ from paho.mqtt import client as mqtt_client
 # def get_iotdb_datatype(data_obj):
 
 
+def get_iotdb_datatype(obj):
+    reflist = [
+        (TSDataType.BOOLEAN, [bool, np.bool_]),
+        (TSDataType.INT32, [int, np.int32]),
+        (TSDataType.INT64, [np.int64]),
+        (
+            TSDataType.FLOAT,
+            [float, np.float64, np.float32],
+        ),
+        (TSDataType.DOUBLE, [np.double]),
+        (TSDataType.TEXT, [np.char, np.string_, np.str_s, str]),
+    ]
+
+
 class iotdb_session(object):
-    """Ties the MQTT Topics to the"""
+    """Ties the MQTT Topics to the iotdb storage"""
 
     def __init__(
         self,
@@ -45,7 +60,7 @@ class iotdb_session(object):
             compressor_lst_,
         )
 
-    def insert_data(self, datadict):
+    def insert_data(self, topic, datadict):
         meas_list = []
         d_list = []
         val_list = []
@@ -99,8 +114,9 @@ def subscribe(client: mqtt_client, topic: str):
         msg_decode = msg_in.payload.decode()
         try:
             msg_dejson = json.loads(msg_decode)
-        except:
+        except Exception as e:
             msg_dejson = None
+            print(e)
 
         client.subscribe(topic)
         client.on_message = on_message

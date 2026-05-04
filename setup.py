@@ -22,6 +22,8 @@ req = [
     "RPi.bme280",
     "pyyaml",
     "psutil",
+    "paho-mqtt",
+    "loguru",
 ]
 scripts = [
     "bin/run_weather.py",

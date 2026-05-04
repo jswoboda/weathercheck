@@ -10,6 +10,8 @@ from .systeminfo import get_system_dict
 def bme280_scrape(client, sys_name=None, topic_suf="BME280reading"):
     """Gets current environment measurements from bme280 and publishes them to MQTT.
 
+          - RECORDER_ANNOUNCE_TOPIC=dt/vsword/{service.name}/{service.node_id}/announce
+          - RECORDER_COMMAND_TOPIC=cmd/vsword/{service.name}/{service.node_id}/request
     Parameters
     ----------
     client : mqtt.client
@@ -27,7 +29,7 @@ def bme280_scrape(client, sys_name=None, topic_suf="BME280reading"):
     """
     if sys_name is None:
         sys_name = platform.node()
-    topic = sys_name + "/" + topic_suf
+    topic = "dt/weathercheck/" + topic_suf + "/" + sys_name + "/" + "data"
     bme_data = bme280_dict()
     for ikey, iobj in bme_data.items():
         if isinstance(iobj, datetime):
@@ -58,7 +60,7 @@ def sys_scrape(client, sys_name=None, topic_suf="compute_status"):
 
     if sys_name is None:
         sys_name = sys_read_name
-    topic = sys_name + "/" + topic_suf
+    topic = "dt/weathercheck/" + topic_suf + "/" + sys_name + "/status"
     for ikey, iobj in sys_data.items():
         if isinstance(iobj, datetime):
             sys_data["timestamp"] = iobj.timestamp()
