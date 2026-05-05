@@ -1,4 +1,5 @@
 #!python
+import sys
 from pathlib import Path
 
 import yamale
