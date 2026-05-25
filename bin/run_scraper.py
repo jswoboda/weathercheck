@@ -98,21 +98,41 @@ SYS_FAIL_COUNT = 0
 
 
 def get_certs(certfolder=""):
+    """Finds the folder with all of the cert files.
+
+    Parameters
+    ----------
+    certfolder : str
+        The folder holding the tls certs.
+
+    Returns
+    -------
+    ca_certs_in : str
+        The ca cert.
+    certfile_in : str
+        The cert file with a .pen suffix
+    keyfile_in : str
+        The key file part of the cert.
+    """
     if not certfolder:
         return None, None, None
-        # ca_certs_in = None
-        # certfile_in = None
-        # keyfile_in = None
 
     cert_path = Path(certfolder)
     cert_path.expanduser()
-    ca_certs_in = str(cert_path.join("ca.pem"))
-    certfile_in = str(cert_path.join("client.pen"))
-    keyfile_in = str(cert_path.join("client.key"))
+    ca_certs_in = str(cert_path.joinpath("ca.pem"))
+    certfile_in = str(cert_path.joinpath("client.pem"))
+    keyfile_in = str(cert_path.joinpath("client.key"))
     return ca_certs_in, certfile_in, keyfile_in
 
 
 def bme_scrape_cont(client):
+    """For the schedule command.
+
+    Parameters
+    ----------
+    client : mqtt.client
+        The MQTT client.
+    """
     global BME_FAIL_COUNT
     result = bme280_scrape(client)
     if result:
@@ -122,6 +142,13 @@ def bme_scrape_cont(client):
 
 
 def sys_scrape_cont(client):
+    """For the schedule command.
+
+    Parameters
+    ----------
+    client : mqtt.client
+        The MQTT client.
+    """
     global SYS_FAIL_COUNT
     result = sys_scrape(client)
     if result:
@@ -131,7 +158,7 @@ def sys_scrape_cont(client):
 
 
 def scraper_main(broker, port, enrevisit, sysrevisit, certfolder=""):
-    """Runs the Scraper function.
+    """Runs the scraper functions.
 
     Parameters
     ----------

@@ -1,7 +1,7 @@
 import json
 import sys
 from datetime import UTC, datetime
-
+import platform
 import numpy as np
 from iotdb.dbapi import connect
 from iotdb.Session import Session
@@ -13,16 +13,20 @@ from paho.mqtt import client as mqtt_client
 
 def get_iotdb_datatype(obj):
     reflist = [
-        (TSDataType.BOOLEAN, [bool, np.bool_]),
-        (TSDataType.INT32, [int, np.int32]),
-        (TSDataType.INT64, [np.int64]),
+        (TSDataType.BOOLEAN, (bool, np.bool_)),
+        (TSDataType.INT32, (int, np.int32)),
+        (TSDataType.INT64, (np.int64)),
         (
             TSDataType.FLOAT,
-            [float, np.float64, np.float32],
+            (float, np.float64, np.float32),
         ),
-        (TSDataType.DOUBLE, [np.double]),
-        (TSDataType.TEXT, [np.char, np.string_, np.str_s, str]),
+        (TSDataType.DOUBLE, (np.double)),
+        (TSDataType.TEXT, (np.char, np.bytes_, str)),
     ]
+    for iotdbtype, ttup in reflist:
+        if isinstance(obj, ttup):
+            return iotdbtype
+    return None
 
 
 class iotdb_session(object):
@@ -34,15 +38,24 @@ class iotdb_session(object):
         port_,
         username_,
         password_,
-        measurements_list_,
-        data_type_list_,
+        data_dict,
         ts_name,
         store_group,
-        device_id,
+        device_id=platform.node(),
         fetch_size=1024,
         zone_id="UTC",
         enable_redirection=False,
     ):
+        measurements_list_ = []
+        data_type_list_ = []
+        for iname, iobj in data_dict.items():
+            if "timestamp" in iname:
+                continue
+            measurements_list_.append(iname)
+            data_type_list_.append(get_iotdb_datatype(iobj))
+
+        measurements_list_ = [iname for iname in data_dict.keys()]
+        data_type_list_ =
         self.sesh = Session(ip, port_, username_, password_, fetch_size, zone_id)
         self.sesh.open(False)
         self.sesh.set_storage_group(store_group)
@@ -60,7 +73,7 @@ class iotdb_session(object):
             compressor_lst_,
         )
 
-    def insert_data(self, topic, datadict):
+    def insert_data(self, datadict):
         meas_list = []
         d_list = []
         val_list = []
