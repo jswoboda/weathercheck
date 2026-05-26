@@ -13,7 +13,7 @@ SYS_SESH = iotdb_session(
     ip, port_, username_, password_, sys_info, "sys_info", "root.daytest"
 )
 ENV_SESH = iotdb_session(
-    ip, port_, username_, password_, sys_info, "env_info", "root.daytest"
+    ip, port_, username_, password_, sys_info, "env_info", "root.daytest2"
 )
 
 
