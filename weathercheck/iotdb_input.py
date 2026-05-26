@@ -1,7 +1,8 @@
 import json
+import platform
 import sys
 from datetime import UTC, datetime
-import platform
+
 import numpy as np
 from iotdb.dbapi import connect
 from iotdb.Session import Session
@@ -54,8 +55,6 @@ class iotdb_session(object):
             measurements_list_.append(iname)
             data_type_list_.append(get_iotdb_datatype(iobj))
 
-        measurements_list_ = [iname for iname in data_dict.keys()]
-        data_type_list_ =
         self.sesh = Session(ip, port_, username_, password_, fetch_size, zone_id)
         self.sesh.open(False)
         self.sesh.set_storage_group(store_group)
