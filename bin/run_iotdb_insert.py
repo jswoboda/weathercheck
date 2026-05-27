@@ -10,6 +10,7 @@ username_ = "root"
 password_ = "root"
 sys_name, sys_info = get_system_dict()
 bmedict = bme280_dict()
+del bmedict["Time"]
 SYS_SESH = iotdb_session(
     ip, port_, username_, password_, sys_info, "sys_info", "root.daytest"
 )
