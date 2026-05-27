@@ -21,7 +21,6 @@ def getformatedbme():
     bmedict["timestamp"] = dt.timestamp()
     del bmedict["Time"]
 
-    del bmedict["Time"]
     temp = bmedict["Temperature_C"]
     bmedict["Temperature"] = temp
     del bmedict["Temperature_C"]
