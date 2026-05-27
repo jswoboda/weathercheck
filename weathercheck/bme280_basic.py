@@ -94,10 +94,10 @@ def bme280_dict():
         Puts the data from the bme280 call to a dictionary.
     """
     colsw = [
-        "Temperature in C",
-        "Temperature in F",
-        "Dewpoint in C",
-        "Dewpoint in F",
+        "Temperature_C",
+        "Temperature_F",
+        "Dewpoint_C",
+        "Dewpoint_F",
         "Humidity",
         "Pressure",
         "Time",
