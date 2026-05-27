@@ -9,11 +9,31 @@ port_ = "6667"
 username_ = "root"
 password_ = "root"
 sys_name, sys_info = get_system_dict()
-bmedict = bme280_dict()
-del bmedict["Time"]
+
 SYS_SESH = iotdb_session(
     ip, port_, username_, password_, sys_info, "sys_info", "root.daytest"
 )
+
+
+def getformatedbme():
+    bmedict = bme280_dict()
+    dt = bmedict["Time"]
+    bmedict["timestamp"] = dt.timestamp()
+    del bmedict["Time"]
+
+    del bmedict["Time"]
+    temp = bmedict["Temperature_C"]
+    bmedict["Temperature"] = temp
+    del bmedict["Temperature_C"]
+    del bmedict["Temperature_F"]
+
+    dewpoint = bmedict["Dewpoint_C"]
+    bmedict["Dewpoint"] = dewpoint
+    del bmedict["Dewpoint_C"]
+    del bmedict["Dewpoint_F"]
+    return bmedict
+
+
 ENV_SESH = iotdb_session(
     ip, port_, username_, password_, bmedict, "env_info", "root.daytest2"
 )
@@ -30,14 +50,12 @@ def insert_system_info():
     SYS_SESH.insert_data(sys_info)
 
 
-@repeat(every(30).minutes)
+@repeat(every(5).minutes)
 def insert_env_info():
     global ENV_SESH
     global LOGGER
-    bmedict = bme280_dict()
-    dt = bmedict["Time"]
-    del bmedict["Time"]
-    bmedict["timestamp"] = dt.timestamp()
+    bmedict = getformatedbme()
+
     LOGGER.info("Inserting environment info.")
     ENV_SESH.insert_data(bmedict)
 
