@@ -49,13 +49,15 @@ def read_yaml_config(yamlfile, schemafile=None):
     return data[0][0]
 
 
-def setuplog(logfile=None, file_name=__file__, serializelogfile=False):
+def setuplog(logfile=None, serializelogfile=False):
     """Set up the logger object.
 
     Parameters
     ----------
     logfile : str
         Name of the log file.
+    serializelogfile : bool
+        Turn the logfile in json strings.
 
     Returns
     -------

@@ -24,6 +24,8 @@ req = [
     "psutil",
     "paho-mqtt",
     "loguru",
+    "yamale",
+    "jsonargparse",
 ]
 scripts = [
     "bin/run_weather.py",
