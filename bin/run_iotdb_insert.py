@@ -54,7 +54,7 @@ def insert_system_info():
 def insert_env_info():
     global ENV_SESH
     global LOGGER
-
+    bmedict = getformatedbme()
     LOGGER.info("Inserting environment info.")
     ENV_SESH.insert_data(bmedict)
 
