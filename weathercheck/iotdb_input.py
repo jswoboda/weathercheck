@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 import numpy as np
 from iotdb.dbapi import connect
 from iotdb.Session import Session
+from iotdb.utils.exception import StatementExecutionException
 from iotdb.utils.IoTDBConstants import Compressor, TSDataType, TSEncoding
 from paho.mqtt import client as mqtt_client
 
@@ -31,7 +32,7 @@ def get_iotdb_datatype(obj):
 
 
 class iotdb_session(object):
-    """Ties the MQTT Topics to the iotdb storage"""
+    """Ties the MQTT Topics to the iotdb storage. It will create a dataset root.<device_id>.<ts_name> and the insert data will save stuff to it."""
 
     def __init__(
         self,
@@ -41,12 +42,42 @@ class iotdb_session(object):
         password_,
         data_dict,
         ts_name,
-        store_group,
+        remake_store=False,
         device_id=platform.node(),
         fetch_size=1024,
         zone_id="UTC",
         enable_redirection=False,
+        logfunc=print,
     ):
+        """
+
+        Parameters
+        ----------
+        ip : str
+            ip address of the iotdb database.
+        port_ : int
+            Port number to input data.
+        username_ : str
+            Username for the database
+        password_ : str
+            Password for the database
+        data_dict : dict
+            Dictionary with data set that will be inserted.
+        ts_name : str
+            Name of the time series that will be created.
+        remake_store : bool
+            If True will remake the storage group.
+        device_id : str
+            The name of the device the data is associated with
+        fetch_size : int
+            How much data to fetch
+        zone_id : str
+            The time zone id string
+        enable_redirection : bool
+            Redirection?
+        logfunc : func
+            The logging function.
+        """
         measurements_list_ = []
         data_type_list_ = []
         for iname, iobj in data_dict.items():
@@ -57,22 +88,43 @@ class iotdb_session(object):
 
         self.sesh = Session(ip, port_, username_, password_, fetch_size, zone_id)
         self.sesh.open(False)
-        self.sesh.set_storage_group(store_group)
+
         self.ts_name = ts_name
+        store_group = "root." + device_id
         self.store_group = store_group
+        self.logfunc = logfunc
+        try:
+            self.sesh.set_storage_group(store_group)
+        except StatementExecutionException:
+            logfunc(f"Storage group {store_group} already exists")
+            if remake_store:
+                self.sesh.delete_storage_group(store_group)
+                self.sesh.set_storage_group(store_group)
+
         self.measurements = measurements_list_
         self.datatypes = data_type_list_
         encoding_lst_ = [TSEncoding.PLAIN for _ in range(len(data_type_list_))]
         compressor_lst_ = [Compressor.SNAPPY for _ in range(len(data_type_list_))]
-        self.sesh.create_aligned_time_series(
-            store_group + "." + ts_name,
-            measurements_list_,
-            data_type_list_,
-            encoding_lst_,
-            compressor_lst_,
-        )
+        try:
+            # Create all of the times series
+            self.sesh.create_aligned_time_series(
+                store_group + "." + ts_name,
+                measurements_list_,
+                data_type_list_,
+                encoding_lst_,
+                compressor_lst_,
+            )
+        except StatementExecutionException:
+            logfunc(f"{store_group + '.' + ts_name} already exists.")
 
     def insert_data(self, datadict):
+        """Insert data to the time series.
+
+        Parameters
+        ----------
+        datadict : dict
+            The dictionary that will be input to the dataset.
+        """
         meas_list = []
         d_list = []
         val_list = []

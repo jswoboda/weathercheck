@@ -9,9 +9,9 @@ port_ = "6667"
 username_ = "root"
 password_ = "root"
 sys_name, sys_info = get_system_dict()
-
+LOGGER = setuplog()
 SYS_SESH = iotdb_session(
-    ip, port_, username_, password_, sys_info, "sys_info", "root.daytest"
+    ip, port_, username_, password_, sys_info, "sys_info", logfunc=LOGGER.info
 )
 
 
@@ -35,10 +35,8 @@ def getformatedbme():
 
 bmedict = getformatedbme()
 ENV_SESH = iotdb_session(
-    ip, port_, username_, password_, bmedict, "env_info", "root.daytest2"
+    ip, port_, username_, password_, bmedict, "env_info", logfunc=LOGGER.info
 )
-
-LOGGER = setuplog()
 
 
 @repeat(every(1).minutes)
