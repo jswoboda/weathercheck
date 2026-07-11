@@ -119,6 +119,16 @@ EMAIL_TIME = datetime(year=2025, month=1, day=1).astimezone(timezone.utc)
 
 
 def send_emergency_email(plotpath, emailconfig):
+    """Sends out an email if there's an emergency.
+
+    Parameters
+    ----------
+    plotpath : Path
+        The directory where the plots will be saved.
+    emailconfig : dict
+        The dictionary with all of the email information.
+    """
+
     global DF_EMERG, EMAIL_TIME, TIME_ZONE
     EMAIL_TIME = datetime.now().astimezone(timezone.utc)
     fig, ax = plt.subplots(1, 1, figsize=(8, 10))
@@ -126,7 +136,7 @@ def send_emergency_email(plotpath, emailconfig):
     df_plot.index = df_plot.index.tz_convert(TIME_ZONE)
     df_plot.plot(y="Temperature in F", ax=ax)
     ax.set_xlabel(f"Time: ({TIME_ZONE})")
-    ax.grid(True)
+    ax.set_grid(True)
     now = datetime.now().replace(microsecond=0).astimezone(timezone.utc)
     now_str = "Emergency_Plot" + now.isoformat()[:-6]
     plotstr = str(plotpath.joinpath(now_str + ".png"))
@@ -138,6 +148,13 @@ def send_emergency_email(plotpath, emailconfig):
 
 
 def updatedf(thresh_f, plotpath, emailconfig):
+    """Update the pandas dataframe holding the temperature measurements.
+
+    Parameters
+    ----------
+    thresh_f : float
+        The threshold temperature where the
+    """
     global DF_GLOBE, TEMP_FLAG, DROP_TIME, DF_EMERG, EMAIL_TIME
     df_i, last_ts = mkdf()
     DF_GLOBE = pd.concat([DF_GLOBE, df_i])

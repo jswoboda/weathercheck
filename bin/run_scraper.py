@@ -174,7 +174,15 @@ def scraper_main(broker, port, enrevisit, sysrevisit, certfolder=""):
         The folder holding the certs.
     """
     global SYS_FAIL_COUNT, BME_FAIL_COUNT
-    client = connect_mqtt(broker, port)
+    ca_certs_in, certfile_in, keyfile_in = get_certs(certfolder)
+
+    client = connect_mqtt(
+        broker,
+        port,
+        ca_certs_in=ca_certs_in,
+        certfile_in=certfile_in,
+        keyfile_in=keyfile_in,
+    )
 
     env_job = schedule.every(enrevisit).seconds.do(bme_scrape_cont, client=client)
     sys_job = schedule.every(sysrevisit).seconds.do(sys_scrape_cont, client=client)

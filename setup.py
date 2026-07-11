@@ -26,6 +26,7 @@ req = [
     "loguru",
     "yamale",
     "jsonargparse",
+    "apache-iotdb",
 ]
 scripts = [
     "bin/run_weather.py",

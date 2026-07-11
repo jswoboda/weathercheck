@@ -16,12 +16,11 @@ from .iotdb_input import iotdb_session
 def connect_mqtt(
     broker,
     port,
-    iotdb_sesh,
     client_id=f"python-mqtt-{random.randint(0, 1000)}",
     ca_certs_in=None,
     certfile_in=None,
     keyfile_in=None,
-    keepalive=2400,
+    keepalive=100,
 ):
     """Returns a client object to connect to MQTT.
     Parameters
@@ -50,8 +49,8 @@ def connect_mqtt(
         client_id=client_id,
         callback_api_version=mqtt_client.CallbackAPIVersion.VERSION2,
     )
-    if ca_certs_in is not None:
-        client.tls_set(ca_certs=ca_certs_in, certfile=certfile_in, keyfile=keyfile_in)
+
+    client.tls_set(ca_certs=ca_certs_in, certfile=certfile_in, keyfile=keyfile_in)
 
     # client.username_pw_set(username, password)
     client.on_connect = on_connect
