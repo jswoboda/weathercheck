@@ -14,7 +14,6 @@ import yaml
 from weathercheck import get_bme280_data, mkdf, send_email, sys_stats
 
 matplotlib.use("Agg")
-import ipdb
 import matplotlib.pyplot as plt
 
 
