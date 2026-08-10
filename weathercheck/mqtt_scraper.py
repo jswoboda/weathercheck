@@ -37,6 +37,7 @@ def bme280_scrape(client, sys_name=None, topic_suf="BME280reading"):
             bme_data["timestamp"] = iobj.timestamp()
             del bme_data[ikey]
     bmejson = json.dumps(bme_data)
+    print(topic)
     return publish_dict(client, topic, bmejson)
 
 
