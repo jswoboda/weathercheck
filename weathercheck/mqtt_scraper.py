@@ -1,7 +1,7 @@
 import json
 import platform
 from datetime import datetime
-
+from copy import copy
 from .bme280_basic import bme280_dict
 from .mqtt_tools import connect_mqtt, publish_dict
 from .systeminfo import get_system_dict
@@ -31,7 +31,8 @@ def bme280_scrape(client, sys_name=None, topic_suf="BME280reading"):
         sys_name = platform.node()
     topic = "dt/weathercheck/" + topic_suf + "/" + sys_name + "/" + "data"
     bme_data = bme280_dict()
-    for ikey, iobj in bme_data.items():
+    bme_copy = copy(bme_data)
+    for ikey, iobj in bme_copy.items():
         if isinstance(iobj, datetime):
             bme_data["timestamp"] = iobj.timestamp()
             del bme_data[ikey]
@@ -61,7 +62,8 @@ def sys_scrape(client, sys_name=None, topic_suf="compute_status"):
     if sys_name is None:
         sys_name = sys_read_name
     topic = "dt/weathercheck/" + topic_suf + "/" + sys_name + "/status"
-    for ikey, iobj in sys_data.items():
+    sys_copy = copy(sys_data)
+    for ikey, iobj in sys_copy.items():
         if isinstance(iobj, datetime):
             sys_data["timestamp"] = iobj.timestamp()
             del sys_data[ikey]
