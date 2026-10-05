@@ -160,12 +160,8 @@ async def _handle_mqtt_message(
     mongo_collection,
 ) -> None:
     """
-    Supported actions — JSON payload on recorder/schedule:
-
-        Add schedule:    {"action": "add",      "start": "yyyy-mm-ddTHH:MM:00Z", 'end': "yyyy-mm-ddTHH:MM:00Z" }
-        Remove schedule: {"action": "remove",   "start": "yyyy-mm-ddTHH:MM:00Z", 'end': "yyyy-mm-ddTHH:MM:00Z"}
-        List schedules:  {"action": "list"}
-        Run now:         {"action": "run_now",   'end': "yyyy-mm-ddTHH:MM:00Z"}
+    The topic format is assumed to be the following
+    dt/<>/<>/<>
     """
     try:
         topic = message.topic
@@ -202,6 +198,7 @@ async def mqtt_listener(
         "metaField": "meta",
         "granularity": "seconds",
     }
+    #collection name
     mongo_col_name = "network"
     if mongo_db_name not in db_list:
         # The database doesn't exist, so we attempt to create it by creating a collection
