@@ -96,8 +96,7 @@ async def mqtt_listener(
     """Connect to broker, subscribe, and process commands — reconnects on error."""
     tls_params = build_tls_params(mqtt_cfg.tls)
     tls_label = "TLS" if tls_params else "plain"
-    import pdb
-    pdb.set_trace()
+
     cl_dict = asdict(mg_cfg)
     if mg_cfg.username == "":
         del cl_dict["username"]
@@ -172,6 +171,7 @@ if __name__ == "__main__":
         port=ns.broker_port,
         tls=tls,
     )
-    mgcfg: MongoConfig = ns.mongo
+    cfg = parser.instantiate_classes
+    mgcfg: MongoConfig = cfg.mongo
 
     anyio.run(main, mqcfg,mgcfg)
