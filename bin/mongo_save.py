@@ -126,7 +126,7 @@ async def mqtt_listener(
 
 def build_parser() -> ArgumentParser:
     p = ArgumentParser(
-        description="Receive-system schedule listener (sys_r_listener.py)"
+        description="Mongo db listener for mqtt messages."
     )
     p.add_argument("--config", action=ActionConfigFile, help="YAML / JSON config file")
     p.add_class_arguments(TLSConfig, nested_key="tls")
@@ -169,6 +169,6 @@ if __name__ == "__main__":
         port=ns.broker_port,
         tls=tls,
     )
-    mgcfg = MongoConfig(**asdict(ns.mongo))
+    mgcfg: MongoConfig = ns.mongo
 
     anyio.run(main, mqcfg,mgcfg)
