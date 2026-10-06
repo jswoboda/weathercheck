@@ -71,6 +71,8 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         payload = json.loads(message.payload.decode())
 
         payload["meta"] = meta
+        import pdb
+        pdb.set_trace()
         await collection.insert_one(payload)
 
     except json.JSONDecodeError:
