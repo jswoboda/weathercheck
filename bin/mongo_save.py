@@ -50,8 +50,8 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         topic = message.topic
         topic_parts = topic.value.split("/")
         meta = {f"node": topic_parts[3]}
-        mongo_db_name = topic[1]
-        mongo_col_name = topic[2]
+        mongo_db_name = topic_parts[1]
+        mongo_col_name = topic_parts[2]
         if mongo_db_name not in db_list:
             # The database doesn't exist, so we attempt to create it by creating a collection
             db = mongo_cl[mongo_db_name]
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     except:
         logname = None
     logging = setuplog(logname)
-    cfg = parser.instantiate_classes(ns)
+    cfg = parser.instantiate(ns)
     mgcfg: MongoConfig = cfg.mongo
 
     anyio.run(main, mqcfg, mgcfg, logging)
