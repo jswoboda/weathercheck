@@ -171,7 +171,7 @@ if __name__ == "__main__":
         port=ns.broker_port,
         tls=tls,
     )
-    cfg = parser.instantiate_classes
+    cfg = parser.instantiate_classes(ns)
     mgcfg: MongoConfig = cfg.mongo
 
     anyio.run(main, mqcfg,mgcfg)
