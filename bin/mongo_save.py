@@ -57,6 +57,8 @@ async def _handle_mqtt_message(
     }
 
 
+    import pdb
+    pdb.set_trace()
     try:
         topic = message.topic
         topic_parts = topic.split("/")
