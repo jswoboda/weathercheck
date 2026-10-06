@@ -16,12 +16,8 @@ import anyio
 from anyio.abc import TaskGroup
 
 
-from weathercheck import (
-    TLSConfig,
-    MQTTConfig,
-    build_tls_params,
-    AppConfig
-)
+from weathercheck import TLSConfig, MQTTConfig, build_tls_params, AppConfig, setuplog
+
 
 @dataclass
 class MongoConfig:
@@ -33,17 +29,11 @@ class MongoConfig:
     username: Optional[str] = ""
     password: Optional[str] = ""
 
+
 # ── MQTT message handler ──────────────────────────────────────────────────────
 
 
-
-
-
-
-async def _handle_mqtt_message(
-    message,
-    mongo_cl,
-) -> None:
+async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
     """
     dt/<programname>/<subject>/<systemname>/<info>
     """
@@ -56,12 +46,12 @@ async def _handle_mqtt_message(
         "granularity": "seconds",
     }
 
-
     import pdb
+
     pdb.set_trace()
     try:
         topic = message.topic
-        topic_parts = topic.split("/")
+        topic_parts = topic.value.split("/")
         meta = {f"node": topic_parts[3]}
         mongo_db_name = topic[1]
         mongo_col_name = topic[2]
@@ -69,7 +59,9 @@ async def _handle_mqtt_message(
             # The database doesn't exist, so we attempt to create it by creating a collection
             db = mongo_cl[mongo_db_name]
             try:
-                await db.create_collection(mongo_col_name, timeseries=time_series_options)
+                await db.create_collection(
+                    mongo_col_name, timeseries=time_series_options
+                )
                 logging.info(f"Database and collection '{mongo_col_name}' created.")
             except:
                 logging.warning(f"Collection '{mongo_col_name}' already exists.")
@@ -91,9 +83,7 @@ async def _handle_mqtt_message(
 
 
 async def mqtt_listener(
-    mqtt_cfg: MQTTConfig,
-    mg_cfg: MongoConfig,
-    tg:TaskGroup
+    mqtt_cfg: MQTTConfig, mg_cfg: MongoConfig, logging: logger, tg: TaskGroup
 ) -> None:
     """Connect to broker, subscribe, and process commands — reconnects on error."""
     tls_params = build_tls_params(mqtt_cfg.tls)
@@ -113,28 +103,28 @@ async def mqtt_listener(
                 tls_params=tls_params,
             ) as client:
                 await client.subscribe("dt/#")
-                print(
+                logging.info(
                     f"# MQTT connected ({tls_label})"
                     f" → {mqtt_cfg.broker}:{mqtt_cfg.port}"
                 )
 
                 async for message in client.messages:
-                    await _handle_mqtt_message(message, mongo_cl)
+                    await _handle_mqtt_message(message, mongo_cl, logging)
 
         except aiomqtt.MqttError as exc:
-            print(f"# MQTT error: {exc} — reconnecting in {mqtt_cfg.keepalive}s …")
+            logging.info(
+                f"# MQTT error: {exc} — reconnecting in {mqtt_cfg.keepalive}s …"
+            )
             await anyio.sleep(mqtt_cfg.keepalive)
 
 
-
-
 def build_parser() -> ArgumentParser:
-    p = ArgumentParser(
-        description="Mongo db listener for mqtt messages."
-    )
+
+    p = ArgumentParser(description="Mongo db listener for mqtt messages.")
+    parser.add_argument("--logs", type=Path, default=Path("~/logs").expanduser())
     p.add_argument("--config", action=ActionConfigFile, help="YAML / JSON config file")
     p.add_class_arguments(TLSConfig, nested_key="tls")
-    p.add_class_arguments(MongoConfig,nested_key="mongo")
+    p.add_class_arguments(MongoConfig, nested_key="mongo")
     p.add_argument(
         "--broker_host",
         type=str,
@@ -150,11 +140,11 @@ def build_parser() -> ArgumentParser:
 
     return p
 
-async def main(cfg: MQTTConfig, mgcfg: MongoConfig) -> None:
 
+async def main(cfg: MQTTConfig, mgcfg: MongoConfig, logging: logger) -> None:
 
     async with anyio.create_task_group() as tg:
-        tg.start_soon(mqtt_listener, cfg, mgcfg, tg)
+        tg.start_soon(mqtt_listener, cfg, mgcfg, logging, tg)
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
@@ -173,7 +163,15 @@ if __name__ == "__main__":
         port=ns.broker_port,
         tls=tls,
     )
+    log_path = ns.logs
+
+    try:
+        log_path.mkdir(exist_ok=True)
+        logname = str(log_path.joinpath("mongosave.log"))
+    except:
+        logname = None
+    logging = setuplog(logname)
     cfg = parser.instantiate_classes(ns)
     mgcfg: MongoConfig = cfg.mongo
 
-    anyio.run(main, mqcfg,mgcfg)
+    anyio.run(main, mqcfg, mgcfg, logging)

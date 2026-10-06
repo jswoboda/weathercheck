@@ -1,7 +1,7 @@
 import platform
 import shutil
 import time
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import psutil
 
@@ -47,7 +47,7 @@ def sys_stats():
     ram = psutil.virtual_memory()
     ram_per = ram.percent
     ram_usedGB = ram.used * 2**-30
-    timestamp = datetime.now(UTC).timestamp()
+    timestamp = datetime.now(timezone.utc).timestamp()
 
     return uptime, cpu_use, ram_per, ram_usedGB, timestamp
 
