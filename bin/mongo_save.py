@@ -121,7 +121,7 @@ async def mqtt_listener(
 def build_parser() -> ArgumentParser:
 
     p = ArgumentParser(description="Mongo db listener for mqtt messages.")
-    parser.add_argument("--logs", type=Path, default=Path("~/logs").expanduser())
+    p.add_argument("--logs", type=Path, default=Path("~/logs").expanduser())
     p.add_argument("--config", action=ActionConfigFile, help="YAML / JSON config file")
     p.add_class_arguments(TLSConfig, nested_key="tls")
     p.add_class_arguments(MongoConfig, nested_key="mongo")
