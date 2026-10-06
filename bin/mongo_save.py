@@ -46,9 +46,6 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         "granularity": "seconds",
     }
 
-    import pdb
-
-    pdb.set_trace()
     try:
         topic = message.topic
         topic_parts = topic.value.split("/")
