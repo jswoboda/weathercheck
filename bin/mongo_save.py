@@ -13,6 +13,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Optional
 import aiomqtt
 import anyio
+from anyio.abc import TaskGroup
 
 
 from weathercheck import (
@@ -89,7 +90,8 @@ async def _handle_mqtt_message(
 
 async def mqtt_listener(
     mqtt_cfg: MQTTConfig,
-    mg_cfg: MongoConfig
+    mg_cfg: MongoConfig,
+    tg:TaskGroup
 ) -> None:
     """Connect to broker, subscribe, and process commands — reconnects on error."""
     tls_params = build_tls_params(mqtt_cfg.tls)
