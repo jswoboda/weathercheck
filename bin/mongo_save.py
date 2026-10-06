@@ -37,7 +37,8 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
     """
     dt/<programname>/<subject>/<systemname>/<info>
     """
-
+    import pdb
+    pdb.set_trace()
     db_list = mongo_cl.ListDatabaseNames()
     mongo_db_name = "home_monitor"
     time_series_options = {
@@ -52,8 +53,7 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         meta = {f"node": topic_parts[3]}
         mongo_db_name = topic_parts[1]
         mongo_col_name = topic_parts[2]
-        import pdb
-        pdb.set_trace()
+
         if mongo_db_name not in db_list:
             # The database doesn't exist, so we attempt to create it by creating a collection
             db = mongo_cl[mongo_db_name]
