@@ -37,9 +37,7 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
     """
     dt/<programname>/<subject>/<systemname>/<info>
     """
-    import pdb
-    pdb.set_trace()
-    db_list = mongo_cl.ListDatabaseNames()
+
     mongo_db_name = "home_monitor"
     time_series_options = {
         "timeField": "timestamp",
@@ -50,22 +48,22 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
     try:
         topic = message.topic
         topic_parts = topic.value.split("/")
-        meta = {f"node": topic_parts[3]}
+        meta = {"node": topic_parts[3]}
         mongo_db_name = topic_parts[1]
         mongo_col_name = topic_parts[2]
 
-        if mongo_db_name not in db_list:
-            # The database doesn't exist, so we attempt to create it by creating a collection
-            db = mongo_cl[mongo_db_name]
-            try:
-                await db.create_collection(
-                    mongo_col_name, timeseries=time_series_options
-                )
-                logging.info(f"Database and collection '{mongo_col_name}' created.")
-            except:
-                logging.warning(f"Collection '{mongo_col_name}' already exists.")
-        else:
-            logging.warning(f"Database '{mongo_db_name}' already exists.")
+
+        # The database doesn't exist, so we attempt to create it by creating a collection
+        db = mongo_cl[mongo_db_name]
+        try:
+            await db.create_collection(
+                mongo_col_name, timeseries=time_series_options
+            )
+            logging.info(f"Database and collection '{mongo_col_name}' created.")
+        except Exception as excin:
+            logging.error(f"# mongo error: {excin}")
+        # else:
+        #     logging.warning(f"Database '{mongo_db_name}' already exists.")
 
         db = mongo_cl[mongo_db_name]
         collection = db[mongo_col_name]
