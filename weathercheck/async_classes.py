@@ -4,7 +4,7 @@ import platform
 from typing import Optional
 
 import dataclasses
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict,field
 import aiomqtt
 from datetime import datetime, timedelta
 import yaml
