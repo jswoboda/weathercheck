@@ -5,7 +5,7 @@ import json
 from jsonargparse import ActionConfigFile, ArgumentParser
 
 import sys
-from loguru import logging
+from loguru import logger
 from pymongo import MongoClient, AsyncMongoClient
 import ssl
 from pathlib import Path
