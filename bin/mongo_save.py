@@ -96,7 +96,8 @@ async def mqtt_listener(
     """Connect to broker, subscribe, and process commands — reconnects on error."""
     tls_params = build_tls_params(mqtt_cfg.tls)
     tls_label = "TLS" if tls_params else "plain"
-
+    import ipdb
+    ipdb.set_trace()
     cl_dict = asdict(mg_cfg)
     if mg_cfg.username == "":
         del cl_dict["username"]
