@@ -14,7 +14,7 @@ from typing import Optional
 import aiomqtt
 import anyio
 from anyio.abc import TaskGroup
-
+from datetime import datetime, timezone
 
 from weathercheck import TLSConfig, MQTTConfig, build_tls_params, AppConfig, setuplog
 
@@ -71,8 +71,7 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         payload = json.loads(message.payload.decode())
 
         payload["meta"] = meta
-        import pdb
-        pdb.set_trace()
+        payload['timestamp'] = datetime.fromtimestamp(payload['timestamp'],timezone.utc)
         await collection.insert_one(payload)
 
     except json.JSONDecodeError:
