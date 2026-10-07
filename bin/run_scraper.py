@@ -1,5 +1,6 @@
 #!python
 import argparse
+from jsonargparse import ArgumentParser
 import sys
 import time
 from pathlib import Path
@@ -7,6 +8,7 @@ from pathlib import Path
 import schedule
 
 from weathercheck import bme280_scrape, connect_mqtt, sys_scrape
+
 
 
 def parse_command_line(str_input=None):
@@ -41,13 +43,12 @@ def parse_command_line(str_input=None):
             "*" * width,
         )
     )
-    # desc = "This is the run script for SimVSR."
-    # if str_input is None:
-    parser = argparse.ArgumentParser(
-        description=desc, formatter_class=argparse.RawDescriptionHelpFormatter
+
+    parser = ArgumentParser(
+        description=desc,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    # else:
-    #     parser = argparse.ArgumentParser(str_input)
+
     parser.add_argument(
         "-b",
         "--broker",
@@ -88,6 +89,12 @@ def parse_command_line(str_input=None):
         default="",
         type=str,
     )
+    parser.add_argument("--config", action="config")
+    # jsonargparse automatically supports a --config flag to load args from a
+    # YAML/JSON file if you want that behavior; no extra code needed unless
+    # you want to customize it further, e.g.:
+    # parser.add_argument("--config", action="config")
+
     if str_input is None:
         return parser.parse_args()
     return parser.parse_args(str_input)

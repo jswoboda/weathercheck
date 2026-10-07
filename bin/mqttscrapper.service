@@ -1,0 +1,11 @@
+[Unit]
+Description=Run weather mqtt scraper service
+
+[Service]
+Type=simple
+ExecStart=/home/swoboj/weathercheck/bin/run_scraper.sh
+Restart=no
+WorkingDirectory=/home/swoboj/
+
+[Install]
+WantedBy=default.target
