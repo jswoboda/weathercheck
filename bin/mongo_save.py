@@ -54,7 +54,7 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
 
         # The database doesn't exist, so we attempt to create it by creating a collection
         db = mongo_cl[mongo_db_name]
-        collection_list = await database.list_collection_names()
+        collection_list = await db.list_collection_names()
         if not mongo_col_name in collection_list:
             # try:
             await db.create_collection(mongo_col_name, timeseries=time_series_options)
