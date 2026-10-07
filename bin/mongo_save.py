@@ -52,15 +52,12 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         mongo_db_name = topic_parts[1]
         mongo_col_name = topic_parts[2]
 
-
         # The database doesn't exist, so we attempt to create it by creating a collection
         db = mongo_cl[mongo_db_name]
         collection_list = await database.list_collection_names()
-        if not mongo_col_name in collection_list
-        # try:
-            await db.create_collection(
-                mongo_col_name, timeseries=time_series_options
-            )
+        if not mongo_col_name in collection_list:
+            # try:
+            await db.create_collection(mongo_col_name, timeseries=time_series_options)
             logging.info(f"Database and collection '{mongo_col_name}' created.")
         # except Exception as excin:
         #     logging.error(f"# mongo error: {excin}")
@@ -73,7 +70,9 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         payload = json.loads(message.payload.decode())
 
         payload["meta"] = meta
-        payload['timestamp'] = datetime.fromtimestamp(payload['timestamp'],timezone.utc)
+        payload["timestamp"] = datetime.fromtimestamp(
+            payload["timestamp"], timezone.utc
+        )
         await collection.insert_one(payload)
 
     except json.JSONDecodeError:
