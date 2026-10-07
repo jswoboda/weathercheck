@@ -45,3 +45,5 @@ systemctl --user disable weatherrecord.service
 ## Notes 
 
 When using the gps module from adafruit the serial port is not always `/dev/ttyUSB0` if using the USB-C version of the module. It should be in the `/dev/serial/` directory and will require some digging and trial and error.
+
+When using grafana a mongodb plugin is needed. The main one from grafana requires a license you can use [this](https://haohanyang.github.io/mongodb-datasource/) one. The user needs to sign the plugin or allow unsigned plugins.

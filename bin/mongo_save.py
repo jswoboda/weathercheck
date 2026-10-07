@@ -55,13 +55,15 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
 
         # The database doesn't exist, so we attempt to create it by creating a collection
         db = mongo_cl[mongo_db_name]
-        try:
+        collection_list = await database.list_collection_names()
+        if not mongo_col_name in collection_list
+        # try:
             await db.create_collection(
                 mongo_col_name, timeseries=time_series_options
             )
             logging.info(f"Database and collection '{mongo_col_name}' created.")
-        except Exception as excin:
-            logging.error(f"# mongo error: {excin}")
+        # except Exception as excin:
+        #     logging.error(f"# mongo error: {excin}")
         # else:
         #     logging.warning(f"Database '{mongo_db_name}' already exists.")
 
@@ -75,9 +77,9 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
         await collection.insert_one(payload)
 
     except json.JSONDecodeError:
-        print(f"# MQTT bad JSON payload: {message.payload!r}")
+        logging.error(f"# MQTT bad JSON payload: {message.payload!r}")
     except Exception as exc:
-        print(f"# MQTT handler error: {exc}")
+        logging.errodr(f"# MQTT handler error: {exc}")
 
 
 async def mqtt_listener(
