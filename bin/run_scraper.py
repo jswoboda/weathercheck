@@ -220,4 +220,4 @@ if __name__ == "__main__":
         sys.exit(128 + signal)
 
     signal.signal(signal.SIGTERM, sigterm_handler)
-    scraper_main(**arg_dict)
+    scraper_main(args_commd.broker, args_commd.port, args_commd.enrevisit, args_commd.sysrevisit, args_commd.certfolder)
