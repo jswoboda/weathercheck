@@ -4,6 +4,70 @@ from pathlib import Path
 
 import yamale
 from loguru import logger
+from datetime import datetime, timezone
+from typing import Dict, Any
+
+# ───────────────────────────────────────────────────────────────────────────
+# Timestamp precision helpers
+# ───────────────────────────────────────────────────────────────────────────
+
+#: Maps a plugin-declared precision string to the MQTT payload field name.
+PRECISION_FIELD = {
+    "s": "timestamp",
+    "ms": "timestampms",
+    "us": "timestampus",
+    "ns": "timestampns",
+}
+
+#: Maps a precision string to the multiplier used to convert POSIX seconds
+#: into an integer timestamp of that precision.
+PRECISION_MULT = {"s": 1, "ms": 1_000, "us": 1_000_000, "ns": 1_000_000_000}
+
+
+def build_timestamp_payload(precision: str, moment: datetime) -> Dict[str, int]:
+    """Build the integer timestamp field for an MQTT payload.
+
+    Parameters
+    ----------
+    precision : str
+        One of ``"s"``, ``"ms"``, ``"us"``, ``"ns"``. Unknown values fall
+        back to whole seconds.
+    moment : datetime.datetime
+        A timezone-aware UTC instant.
+
+    Returns
+    -------
+    dict
+        A single-key dictionary, e.g. ``{"timestampms": 1699999999123}``.
+    """
+    field_name = PRECISION_FIELD.get(precision, "timestamp")
+    mult = PRECISION_MULT.get(precision, 1)
+    return {field_name: int(moment.timestamp() * mult)}
+
+
+def extract_timestamp(payload: Dict[str, Any], precision: str) -> datetime:
+    """Recover a UTC ``datetime`` from an ack/backlog payload.
+
+    Parameters
+    ----------
+    payload : dict
+        A decoded JSON payload expected to contain the field named per
+        :data:`PRECISION_FIELD`.
+    precision : str
+        The precision string used to pick the field name / multiplier.
+
+    Returns
+    -------
+    datetime.datetime
+        UTC datetime; the Unix epoch if the field is missing (meaning
+        "replay everything").
+    """
+    field_name = PRECISION_FIELD.get(precision, "timestamp")
+    mult = PRECISION_MULT.get(precision, 1)
+    raw = payload.get(field_name)
+    if raw is None:
+        return datetime.fromtimestamp(0, tz=timezone.utc)
+    return datetime.fromtimestamp(raw / mult, tz=timezone.utc)
 
 
 def get_config_loc():

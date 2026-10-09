@@ -1,5 +1,5 @@
 #!python
-""""""
+"""Runs an mqtt listener which takes specific topics and saves them to a mongodb database."""
 import os
 import json
 from jsonargparse import ActionConfigFile, ArgumentParser
@@ -16,7 +16,14 @@ import anyio
 from anyio.abc import TaskGroup
 from datetime import datetime, timezone
 
-from weathercheck import TLSConfig, MQTTConfig, build_tls_params, AppConfig, setuplog
+from weathercheck import (
+    TLSConfig,
+    MQTTConfig,
+    build_tls_params,
+    AppConfig,
+    setuplog,
+    extract_timestamp,
+)
 
 
 @dataclass
@@ -35,7 +42,18 @@ class MongoConfig:
 
 async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
     """
+    Processes the messages with the following topic format.
     dt/<programname>/<subject>/<systemname>/<info>
+    The message payload is then placed in mongodb using the client. The <programname> will be the database <subject> will be the collection <systemname> will be put in the 'node' field in the 'meta' dictionary.
+
+    Parameters
+    ----------
+    message : aiomqtt.Message
+        Message recieved from the mqtt client.
+    mongo_cl : pymongo.AsyncMongoClient
+        The mongodb client for saving the data.
+    logging : loguru.logger
+        Needed for logging any issues.
     """
 
     mongo_db_name = "home_monitor"
@@ -59,10 +77,6 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
             # try:
             await db.create_collection(mongo_col_name, timeseries=time_series_options)
             logging.info(f"Database and collection '{mongo_col_name}' created.")
-        # except Exception as excin:
-        #     logging.error(f"# mongo error: {excin}")
-        # else:
-        #     logging.warning(f"Database '{mongo_db_name}' already exists.")
 
         db = mongo_cl[mongo_db_name]
         collection = db[mongo_col_name]
@@ -78,13 +92,17 @@ async def _handle_mqtt_message(message, mongo_cl, logging) -> None:
     except json.JSONDecodeError:
         logging.error(f"# MQTT bad JSON payload: {message.payload!r}")
     except Exception as exc:
-        logging.errodr(f"# MQTT handler error: {exc}")
+        logging.error(f"# MQTT handler error: {exc}")
 
 
 async def mqtt_listener(
     mqtt_cfg: MQTTConfig, mg_cfg: MongoConfig, logging: logger, tg: TaskGroup
 ) -> None:
-    """Connect to broker, subscribe, and process commands — reconnects on error."""
+    """
+    Connect to broker, subscribe, and process commands — reconnects on error.
+
+
+    """
     tls_params = build_tls_params(mqtt_cfg.tls)
     tls_label = "TLS" if tls_params else "plain"
 
@@ -118,7 +136,14 @@ async def mqtt_listener(
 
 
 def build_parser() -> ArgumentParser:
+    """Build the parser
 
+    Returns
+    -------
+    p : jsonargparse.ArgumentParser
+
+
+    """
     p = ArgumentParser(description="Mongo db listener for mqtt messages.")
     p.add_argument("--logs", type=Path, default=Path("~/logs").expanduser())
     p.add_argument("--config", action=ActionConfigFile, help="YAML / JSON config file")
@@ -141,6 +166,7 @@ def build_parser() -> ArgumentParser:
 
 
 async def main(cfg: MQTTConfig, mgcfg: MongoConfig, logging: logger) -> None:
+    """Main function that sets up the task group to run the listener."""
 
     async with anyio.create_task_group() as tg:
         tg.start_soon(mqtt_listener, cfg, mgcfg, logging, tg)

@@ -4,7 +4,7 @@ import platform
 from typing import Optional
 
 import dataclasses
-from dataclasses import dataclass, asdict,field
+from dataclasses import dataclass, asdict, field
 import aiomqtt
 from datetime import datetime, timedelta
 import yaml
@@ -72,6 +72,7 @@ class MQTTConfig:
     tls: TLSConfig = field(default_factory=TLSConfig)
     client_id: str = platform.node()
 
+
 #     # ── Topics ────────────────────────────────────────────────────────────────
 #     command_topic: str = "schedule/command"
 #     """
@@ -90,13 +91,14 @@ class MQTTConfig:
 #     Subscribers publish their schedule inventory to
 #     ``<list_topic_prefix>/<hostname>`` when queried via
 #     ``cmd/<hostname>/schedule``.
-    # """
+# """
 @dataclass
 class AppConfig:
     broker_host: str = "localhost"
     broker_port: int = 8883
     tls: TLSConfig = field(default_factory=TLSConfig)
     log_folder: Optional[Path] = None
+
 
 # ── Internal YAML helper ──────────────────────────────────────────────────────
 def _load_yaml(path: str | Path, label: str) -> dict:
