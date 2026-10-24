@@ -1,14 +1,16 @@
 #!python
 import argparse
+
+from matplotlib.figure import NonGuiException
 from jsonargparse import ArgumentParser
 import sys
 import time
 from pathlib import Path
 
+
 import schedule
 
-from weathercheck import bme280_scrape, connect_mqtt, sys_scrape
-
+from weathercheck import bme280_scrape, connect_mqtt, sys_scrape, setuplog
 
 
 def parse_command_line(str_input=None):
@@ -89,6 +91,15 @@ def parse_command_line(str_input=None):
         default="",
         type=str,
     )
+    parser.add_argument(
+        "-l",
+        "--log_file",
+        des="log_file",
+        help="Log file name.",
+        default=None,
+        type=Path,
+    )
+
     parser.add_argument("--config", action="config")
     # jsonargparse automatically supports a --config flag to load args from a
     # YAML/JSON file if you want that behavior; no extra code needed unless
@@ -141,10 +152,13 @@ def bme_scrape_cont(client):
         The MQTT client.
     """
     global BME_FAIL_COUNT
+    logger.info("Attempting to send environment info.")
+
     result = bme280_scrape(client)
     if result:
         BME_FAIL_COUNT = 0
     else:
+        logger.warning("Failed to send environment info.")
         BME_FAIL_COUNT += 1
 
 
@@ -157,14 +171,16 @@ def sys_scrape_cont(client):
         The MQTT client.
     """
     global SYS_FAIL_COUNT
+    logger.info("Attempting to send system info.")
     result = sys_scrape(client)
     if result:
         SYS_FAIL_COUNT = 0
     else:
+        logger.warning("Failed to send system info.")
         SYS_FAIL_COUNT += 1
 
 
-def scraper_main(broker, port, enrevisit, sysrevisit, certfolder=""):
+def scraper_main(broker, port, enrevisit, sysrevisit, certfolder="", log_file=None):
     """Runs the scraper functions.
 
     Parameters
@@ -180,9 +196,9 @@ def scraper_main(broker, port, enrevisit, sysrevisit, certfolder=""):
     certfolder : int
         The folder holding the certs.
     """
-    global SYS_FAIL_COUNT, BME_FAIL_COUNT
+    global SYS_FAIL_COUNT, BME_FAIL_COUNT, logger
     ca_certs_in, certfile_in, keyfile_in = get_certs(certfolder)
-
+    logger = setuplog(log_file)
     client = connect_mqtt(
         broker,
         port,
@@ -220,4 +236,11 @@ if __name__ == "__main__":
         sys.exit(128 + signal)
 
     signal.signal(signal.SIGTERM, sigterm_handler)
-    scraper_main(args_commd.broker, args_commd.port, args_commd.enrevisit, args_commd.sysrevisit, args_commd.certfolder)
+    scraper_main(
+        args_commd.broker,
+        args_commd.port,
+        args_commd.enrevisit,
+        args_commd.sysrevisit,
+        args_commd.certfolder,
+        args_commd.log_file,
+    )
