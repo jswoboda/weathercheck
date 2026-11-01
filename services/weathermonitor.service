@@ -3,7 +3,7 @@ Description=Run weather recording service
 
 [Service]
 Type=simple
-ExecStart=/home/swoboj/weathercheck/bin/weathermonitor.sh
+ExecStart=/home/swoboj/weathercheck/scripts/weathermonitor.sh
 Restart=no
 WorkingDirectory=/home/swoboj/
 

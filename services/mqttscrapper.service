@@ -3,7 +3,7 @@ Description=Run weather mqtt scraper service
 
 [Service]
 Type=simple
-ExecStart=/home/swoboj/weathercheck/bin/run_scraper.sh
+ExecStart=/home/swoboj/weathercheck/scripts/run_scraper.sh
 Restart=no
 WorkingDirectory=/home/swoboj/
 
