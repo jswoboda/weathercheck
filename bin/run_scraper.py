@@ -6,7 +6,14 @@ from jsonargparse import ArgumentParser
 import sys
 import time
 from pathlib import Path
+# for the utc now warnings
+import warnings
 
+warnings.filterwarnings(
+    "ignore",
+    message=".*utcnow.*",
+    category=DeprecationWarning,
+)
 
 import schedule
 
