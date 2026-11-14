@@ -101,7 +101,7 @@ def parse_command_line(str_input=None):
     parser.add_argument(
         "-l",
         "--log_file",
-        des="log_file",
+        dest="log_file",
         help="Log file name.",
         default=None,
         type=Path,
