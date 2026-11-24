@@ -10,8 +10,6 @@ from datetime import datetime
 
 from paho.mqtt import client as mqtt_client
 
-from .iotdb_input import iotdb_session
-
 
 def connect_mqtt(
     broker,
@@ -59,26 +57,6 @@ def connect_mqtt(
 
     return client
 
-
-def subscribe(client: mqtt_client, topic: str, iotdb_sesh: iotdb_session):
-    #
-    # ------------------------------
-    # mqtt returns the message here
-    # ------------------------------
-    #
-    def on_message(client, userdata, msg_in):
-        msg_decode = msg_in.payload.decode()
-        try:
-            msg_dejson = json.loads(msg_decode)
-        except:
-            msg_dejson = None
-
-        if msg_dejson is None:
-            msg_dejson = msg_decode
-        else:
-            iotdb_sesh.insert_data(msg_in.topic, msg_dejson)
-
-    client.subscribe(topic)
 
 
 def mqtt2dict(msg):
